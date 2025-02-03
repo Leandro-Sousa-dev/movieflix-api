@@ -19,6 +19,21 @@ app.get("/movies", async (_, res) => {
     res.json(movies);
 });
 
+app.post("/movies", async (req, res) => {
+    await prisma.movie.create({
+        data: {
+            title: "Filme teste",
+            genre_id: 3,
+            language_id: 2,
+            oscar_count: 12,
+            release_date: new Date(1900, 0, 1)
+            
+        }
+    })
+    
+    res.status(201).send("filme cadastrado com sucesso!")
+})
+
 app.listen(port, () => {
     console.log(`servidor online na porta: ${port}`);
 });
