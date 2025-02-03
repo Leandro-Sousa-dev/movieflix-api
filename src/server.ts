@@ -33,9 +33,7 @@ app.post("/movies", async (req, res) => {
         });
 
         if (movieWithSameTitle) {
-            return res
-                .status(409)
-                .send({ message: "Já existe um filme com esse título" });
+            return res.status(409).send({ message: "Já existe um filme com esse título" });
         }
 
         await prisma.movie.create({
@@ -47,11 +45,13 @@ app.post("/movies", async (req, res) => {
                 release_date: new Date(release_date),
             },
         });
+
+        res.status(201).send({ message: "Filme adicionado com sucesso!" });
+
     } catch (error) {
-        return res.status(500).send({ message: "Falha ao cadastrar um filme" });
+        res.status(500).send({ message: "Falha ao cadastrar um filme" });
     }
 
-    res.status(201).send();
 });
 
 app.put("/movies/:id", async (req, res) => {
@@ -72,11 +72,13 @@ app.put("/movies/:id", async (req, res) => {
             : undefined;
 
         await prisma.movie.update({ where: { id }, data });
+
+        res.status(200).send({ message: "Alteração concluída" })
+
     } catch (error) {
-        return res
-            .status(500)
-            .send({ message: "Falha ao atualizar o registro" });
+        res.status(500).send({ message: "Falha ao atualizar o registro" });
     }
+
 });
 
 app.delete("/movies/:id", async (req, res) => {
@@ -92,11 +94,36 @@ app.delete("/movies/:id", async (req, res) => {
         }
 
         await prisma.movie.delete({ where: { id } });
+
+        res.status(200).send({ message: "Filme removido" });
     } catch (error) {
         res.status(500).send({ message: "Falha ao remover o registro" });
     }
 
-    res.status(200).send();
+});
+
+app.get("/movies/:genderName", async (req, res) => {
+    try {
+        const moviesFilteredByGenderName = await prisma.movie.findMany({
+            include: {
+                genres: true,
+                languages: true,
+            },
+            where: {
+                genres: {
+                    name: {
+                        equals: req.params.genderName,
+                        mode: "insensitive",
+                    },
+                },
+            },
+        });
+
+        res.status(200).send(moviesFilteredByGenderName);
+    } catch (error) {
+        res.status(500).send({ message: "Falha ao atualizar um filme" });
+    }
+
 });
 
 app.listen(port, () => {
