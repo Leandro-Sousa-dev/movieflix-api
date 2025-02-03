@@ -124,7 +124,7 @@ app.get("/movies/:genderName", async (req, res) => {
 
         res.status(200).send(moviesFilteredByGenderName);
     } catch (error) {
-        res.status(500).send({ message: "Falha ao atualizar um filme" });
+        res.status(500).send({ message: "Falha ao filtrar" });
     }
 
 });
